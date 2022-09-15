@@ -1,6 +1,7 @@
 package com.playground.application.lesson;
 
 
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +19,12 @@ public class LessonController {
     }
 
     @GetMapping("")
-    public List<Lesson> getAllLessons(){
+    public List<Lesson> getAllLessons() {
         return lessonService.getAll();
     }
 
     @PostMapping("/")
-    public Lesson addLesson( @RequestBody LessonDTO lessonDTO){
+    public Lesson addLesson(@RequestBody LessonDTO lessonDTO) {
 
 
         return lessonService.addLesson(LessonDTO.map(lessonDTO));
@@ -31,18 +32,31 @@ public class LessonController {
 
 
     @GetMapping("/lessons/{id}")
-    public Lesson getLessonById(@PathVariable Long id){
+    public Lesson getLessonById(@PathVariable Long id) {
 
         return lessonService.getLessonById(id);
     }
- @DeleteMapping("lessons/{id}")
-    public Lesson deleteLessonById(@PathVariable Long id){
-        return lessonService.deleteLessonById(id);
- }
 
- @ExceptionHandler(NoSuchElementException.class)
-public ResponseEntity<String> boopHandler(Exception e){
-        return new ResponseEntity<>( e.getMessage(),HttpStatus.NOT_FOUND);
+    @DeleteMapping("lessons/{id}")
+    public Lesson deleteLessonById(@PathVariable Long id) {
+        return lessonService.deleteLessonById(id);
     }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> boopHandler(Exception e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public ResponseEntity<String> handleNoObject(Exception e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArguments(Exception e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+
+    }
+
 }
 

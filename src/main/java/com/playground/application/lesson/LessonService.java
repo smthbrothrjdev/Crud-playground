@@ -2,6 +2,7 @@ package com.playground.application.lesson;
 
 
 import com.playground.application.LogiePoo;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,34 +19,37 @@ public class LessonService {
     }
 
     public List<Lesson> getAll() {
-       return lessonRepo.findAll();
+        return lessonRepo.findAll();
     }
 
     public Lesson addLesson(Lesson lesson) {
-        if (Objects.isNull(lesson)){
+        if (Objects.isNull(lesson)) {
+
             LogiePoo.log("====Error adding lesson to DB: lesson is null =====");
-            return (null);
-        } else if (lessonRepo.findLessonByName(lesson.getName()).isPresent()){
+            throw new ObjectNotFoundException(Lesson.class, "ERROR: Lesson does not exist");
+
+        } else if (lessonRepo.findLessonByName(lesson.getName()).isPresent()) {
             LogiePoo.log("=====Error adding lesson to DB: Lesson already exists====");
-            return (null);
-        }else{
+            throw new IllegalArgumentException("Lesson " + lesson.getName() + " already exists");
+
+        } else {
             lessonRepo.save(lesson);
         }
         return lesson;
     }
 
-    public Lesson getLessonById(Long id)  {
-        return lessonRepo.findById(id).orElseThrow(()->new NoSuchElementException("No lesson matching " +id+"found"));
+    public Lesson getLessonById(Long id) {
+        return lessonRepo.findById(id).orElseThrow(() -> new NoSuchElementException("No lesson matching " + id + "found"));
     }
 
     public Lesson deleteLessonById(Long id) {
 
-       Lesson deleteTarget = lessonRepo.findById(id).orElseThrow(
-               ()->new NoSuchElementException("ERROR Deleting "+id+": does not exist"));
+        Lesson deleteTarget = lessonRepo.findById(id).orElseThrow(
+                () -> new NoSuchElementException("ERROR Deleting " + id + ": does not exist"));
 
 
         lessonRepo.deleteById(deleteTarget.getId());
 
-     return deleteTarget;
+        return deleteTarget;
     }
 }
