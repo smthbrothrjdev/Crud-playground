@@ -1,7 +1,7 @@
 package com.playground.application.lesson;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
+import com.playground.application.LogiePoo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,10 +23,10 @@ public class LessonService {
 
     public Lesson addLesson(Lesson lesson) {
         if (Objects.isNull(lesson)){
-            System.out.println("====Error adding lesson to DB: lesson is null =====");
+            LogiePoo.log("====Error adding lesson to DB: lesson is null =====");
             return (null);
         } else if (lessonRepo.findLessonByName(lesson.getName()).isPresent()){
-            System.out.println("=====Error adding lesson to DB: Lesson already exists====");
+            LogiePoo.log("=====Error adding lesson to DB: Lesson already exists====");
             return (null);
         }else{
             lessonRepo.save(lesson);
@@ -35,7 +35,7 @@ public class LessonService {
     }
 
     public Lesson getLessonById(Long id)  {
-        return lessonRepo.findById(id).orElseThrow(()->new NoSuchElementException("boop"));
+        return lessonRepo.findById(id).orElseThrow(()->new NoSuchElementException("No lesson matching " +id+"found"));
     }
 
     public Lesson deleteLessonById(Long id) {
