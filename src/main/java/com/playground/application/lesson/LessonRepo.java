@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface LessonRepo extends JpaRepository<Lesson,Long> {
-   Optional<Lesson> findLessonByName(String lessonName);
+public interface LessonRepo extends JpaRepository<Lesson, Long> {
+    Optional<Lesson> findLessonByName(String lessonName);
 }
