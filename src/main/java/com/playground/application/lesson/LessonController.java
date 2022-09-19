@@ -1,12 +1,13 @@
 package com.playground.application.lesson;
 
-
 import org.hibernate.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -30,6 +31,31 @@ public class LessonController {
         return lessonService.addLesson(LessonDTO.map(lessonDTO));
     }
 
+
+    @PatchMapping("/lessons/{id}")
+    public Lesson partialUpdateLesson (@PathVariable Long id, @RequestBody Map<String, Object> g)  {
+
+      return lessonService.patchLessonbyID(id, g);
+
+    }
+
+
+    @GetMapping("/lessons/between")
+    public List<Lesson> getLessonsBetweenDate(@RequestParam String date1, String date2){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        //convert String to LocalDate
+        LocalDate startDate = LocalDate.parse(date1, formatter);
+        LocalDate endDate = LocalDate.parse(date2, formatter);
+
+      return  lessonService.findLessonsBetween(startDate, endDate);
+
+    }
+
+    @GetMapping("/lessons/find/{title}")
+    public Lesson findbyName(@PathVariable String title){
+        return lessonService.findByName(title);
+    }
 
     @GetMapping("/lessons/{id}")
     public Lesson getLessonById(@PathVariable Long id) {

@@ -4,10 +4,11 @@ package com.playground.application.lesson;
 import com.playground.application.LogiePoo;
 import org.hibernate.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class LessonService {
@@ -52,4 +53,47 @@ public class LessonService {
 
         return deleteTarget;
     }
-}
+
+
+    public Lesson patchLessonbyID(Long id, Map<String, Object> g) throws  SecurityException
+    {
+        Lesson patchedLesson = lessonRepo.findById(id).orElseThrow(()-> new NoSuchElementException("error patchihg, cannot find element"));
+        g.forEach((k,v)->{
+            Field field = ReflectionUtils.findField(Lesson.class,k);
+            if (Objects.isNull(field)){
+                LogiePoo.log("nothing here");
+            }else{
+                String fieldName= field.getName();
+                String methodName = ("set"+fieldName.substring(0,1).toUpperCase()+fieldName.substring(1));
+                LogiePoo.log("method name =========" +methodName);
+
+                try {
+                    ReflectionUtils.invokeMethod(patchedLesson.getClass().getMethod(methodName, String.class), patchedLesson, v);
+                } catch (NoSuchMethodException e) {
+                    try {
+                        throw new NoSuchMethodException("oops");
+                    } catch (NoSuchMethodException ex) {
+                        LogiePoo.log("UH OH RUNTIME EXCEPTION");
+                    }
+                }
+
+
+            }
+
+        });
+
+
+       return lessonRepo.save(patchedLesson);
+    }
+
+    public Lesson findByName(String title) {
+        return (lessonRepo.findLessonByName(title).orElseThrow(()-> new NoSuchElementException("Cannot find by lesson, no element found")));
+
+    }
+
+    public List<Lesson> findLessonsBetween(LocalDate startDate, LocalDate endDate) {
+
+        return lessonRepo.findByDeliveredOnBetween(startDate,endDate);
+        }
+    }
+
